@@ -47,7 +47,9 @@ async function render(action) {
     //result = applySorting(result, state, action);
     //result = applyPagination(result, state, action);
 
+    query = applyFiltering(query, state, action);
     query = applyPagination(query, state, action);
+    
 
     const {total, items} = await api.getRecords(query);
     updatePagination(total, query);
@@ -70,9 +72,9 @@ const applySorting = initSorting([
     sampleTable.header.elements.sortByTotal
 ]);
 
-/*const applyFiltering = initFiltering(sampleTable.filter.elements, {
-    searchBySeller: indexes.sellers
-});*/
+const filteringResult = initFiltering(sampleTable.filter.elements);
+const applyFiltering = filteringResult.applyFiltering;
+const updateIndexes = filteringResult.updateIndexes;
 
 const {applyPagination, updatePagination} = initPagination(
     sampleTable.pagination.elements,
@@ -90,8 +92,11 @@ const {applyPagination, updatePagination} = initPagination(
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
+
 async function init() {
     const indexes = await api.getIndexes()
-    
+    updateIndexes(sampleTable.filter.elements, {
+        searchBySeller: indexes.sellers
+    });    
 }
 init().then(render);

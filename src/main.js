@@ -39,21 +39,36 @@ function collectState() {
  * @param {HTMLButtonElement?} action
  */
 async function render(action) {
-    let state = collectState(); // состояние полей из таблицы
-    let query = {}; // копируем для последующего изменения
-    // @todo: использование
-    //result = applySearching(result, state, action);
-    //result = applyFiltering(result, state, action);
-    //result = applySorting(result, state, action);
-    //result = applyPagination(result, state, action);
+    try {
+        let state = collectState(); // состояние полей из таблицы
+        let query = {}; // копируем для последующего изменения
+        // @todo: использование
+        //result = applySearching(result, state, action);
+        //result = applyFiltering(result, state, action);
+        //result = applySorting(result, state, action);
+        //result = applyPagination(result, state, action);
+        
 
-    query = applyFiltering(query, state, action);
-    query = applyPagination(query, state, action);
+        if(action && action.target) {
+            query = applyFiltering(query, state, action);
+        } else {
+            query = applyFiltering(query, state);
+        }
+
+        query = applySearching(query, state, action);
+        
+        query = applySorting (query, state, action);
+        query = applyPagination(query, state, action);
+        
+        console.log('Отправляем запрос с параметрами:', query);
+
+        const {total, items} = await api.getRecords(query);
+        updatePagination(total, query);
+        sampleTable.render(items)
+    } catch(e) {
+        console.error('Ошибка рендеринга:', e);
+    }
     
-
-    const {total, items} = await api.getRecords(query);
-    updatePagination(total, query);
-    sampleTable.render(items)
 }
 
 const sampleTable = initTable({
@@ -73,6 +88,10 @@ const applySorting = initSorting([
 ]);
 
 const filteringResult = initFiltering(sampleTable.filter.elements);
+
+if(!sampleTable.filter.elements) {
+    console.error('Элементы фильтра не найдены');
+}
 const applyFiltering = filteringResult.applyFiltering;
 const updateIndexes = filteringResult.updateIndexes;
 

@@ -3,20 +3,26 @@ import {makeIndex} from "./lib/utils.js";
 const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
 
 export function initData(sourceData) {
-        // переменные для кеширования данных
+    // переменные для кеширования данных
     let sellers;
     let customers;
     let lastResult;
     let lastQuery;
 
     // функция для приведения строк в тот вид, который нужен нашей таблице
-    const mapRecords = (data) => data.map(item => ({
+    const mapRecords = (data) => {
+        if (!data || !Array.isArray(data)) {
+            console.error('Ошибка: полученные данные не являются массивом');
+            return [];
+        }
+        return data.map(item => ({
         id: item.receipt_id,
         date: item.date,
         seller: sellers[item.seller_id],
         customer: customers[item.customer_id],
         total: item.total_amount
     }));
+}
 
     // функция получения индексов
     const getIndexes = async () => {
@@ -32,6 +38,7 @@ export function initData(sourceData) {
 
     // функция получения записей о продажах с сервера
     const getRecords = async (query, isUpdated = false) => {
+        try{
             const qs = new URLSearchParams(query); // преобразуем объект параметров в SearchParams объект, представляющий query часть url
             const nextQuery = qs.toString(); // и приводим к строковому виду
 
@@ -41,7 +48,16 @@ export function initData(sourceData) {
 
             // если прошлый квери не был ранее установлен или поменялись параметры, то запрашиваем данные с сервера
             const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
+
+            if(!response.ok) {
+                throw new Error (`Ошибка запроса: ${response.statusText}`);
+            }
+
             const records = await response.json();
+
+            if(!records || !records.total || !records.items) {
+                throw new Error ('Некорректный ответ от сервера');
+            }
 
             lastQuery = nextQuery; // сохраняем для следующих запросов
             lastResult = {
@@ -50,6 +66,13 @@ export function initData(sourceData) {
             };
 
             return lastResult;
+        } catch(error) {
+            console.error ('Ошибка получения записей:', error);
+            return {
+                total: 0,
+                items: []
+            };
+        } 
         };
 
     return {

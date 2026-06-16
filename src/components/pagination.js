@@ -65,9 +65,9 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
             return createPage(el, pageNumber, pageNumber === page);
         }))
          // @todo: #2.5 — обновить статус пагинации
-        fromRow.textContent = (page - 1) * limit + 1;
-        toRow.textContent = Math.min((page * limit), data.length);
-        totalRows.textContent = data.length;
+        fromRow.textContent = (total - 1) * limit + 1;
+        toRow.textContent = Math.min((total * limit), total.length);
+        totalRows.textContent = total.length;
     }
     return {
         updatePagination,

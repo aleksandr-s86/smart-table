@@ -27,10 +27,8 @@ export function initSorting(columns) {
             });
         }
 
-        // сохраним в переменную параметр сортировки в виде field:direction
-        const sort = (field && order !== 'none') ? `${field}:${order}` : null; 
+        const sort = (field && order !== 'none') ? `${field}:${order}` : null;
 
-        // по общему принципу, если есть сортировка, добавляем, если нет, то не трогаем query
-        return sort ? Object.assign({}, query, {sort}) : query;
+        return sort ? Object.assign({}, query, { sort }): query;
     };
 }

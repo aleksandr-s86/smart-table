@@ -5,7 +5,7 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
     const pageTemplate = pages.firstElementChild.cloneNode(true);
     pages.firstElementChild.remove();
 
-    return (data, state, action) => {
+    //return (data, state, action) => {
 
         let pageCount;
 
@@ -38,8 +38,8 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
 
             // @todo: #2.5 — обновить статус пагинации
             fromRow.textContent = (page - 1) * limit + 1;
-            toRow.textContent = Math.min((page * limit), data.length);
-            totalRows.textContent = data.length;
+            toRow.textContent = Math.min((page * limit), total);
+            totalRows.textContent = total;
         }
 
         return {
@@ -56,5 +56,5 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
         // @todo: #2.2 — посчитать сколько строк нужно пропустить и получить срез данных
         const skip = (page - 1) * rowsPerPage;
         return data.slice(skip, skip + rowsPerPage);*/
-    }
+    //}
 }
